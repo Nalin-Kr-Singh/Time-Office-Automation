@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Time Office — Attendance</title>
+  <link rel="stylesheet" href="Java Script And CSS/style.css" />
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-brand"><span>⏱</span> Time Office Automation</div>
+  <div class="topbar-right">
+    <div class="topbar-user" id="topbarUser"></div>
+    <button class="btn-logout" onclick="logout()">Sign Out</button>
+  </div>
+</div>
+
+<!-- NAV TABS -->
+<nav class="nav-tabs">
+  <a href="dashboard.html"  class="nav-tab">📊 Dashboard</a>
+  <a href="shifts.html"     class="nav-tab">🤖 Shift Scheduling</a>
+  <a href="attendance.html" class="nav-tab active">📋 Attendance</a>
+  <a href="payroll.html"    class="nav-tab">💰 Payroll</a>
+  <a href="settings.html"   class="nav-tab">⚙️ Settings</a>
+</nav>
+
+<!-- PAGE CONTENT -->
+<div class="page-content">
+
+  <div class="section-head">
+    <h2>📋 Attendance Anomaly Detection</h2>
+    <div class="section-actions">
+      <div class="search-box form-field" style="min-width:200px;">
+        <input type="text" id="attSearch" placeholder="Search employee..." oninput="renderAttendance()" />
+      </div>
+      <select id="attFilter"
+        style="font-size:0.83rem;padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface);cursor:pointer;"
+        onchange="renderAttendance()">
+        <option value="">All Statuses</option>
+        <option value="Present">Present</option>
+        <option value="Absent">Absent</option>
+        <option value="Late">Late</option>
+        <option value="Half Day">Half Day</option>
+      </select>
+      <button class="btn btn-export" onclick="exportCSV('attendance')">⬇ Export CSV</button>
+    </div>
+  </div>
+
+  <!-- LOG ATTENDANCE FORM -->
+  <div class="form-box">
+    <div class="form-field">
+      <label>Employee Name</label>
+      <input id="aEmp" placeholder="e.g. Priya Sharma" />
+    </div>
+    <div class="form-field">
+      <label>Date</label>
+      <input id="aDate" type="date" />
+    </div>
+    <div class="form-field">
+      <label>Status</label>
+      <select id="aStatus">
+        <option value="Present">✅ Present</option>
+        <option value="Absent">❌ Absent</option>
+        <option value="Late">⏰ Late</option>
+        <option value="Half Day">🌗 Half Day</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label>Check-in Time</label>
+      <input id="aTime" type="time" />
+    </div>
+    <button class="btn btn-primary" onclick="addAttendance()">+ Log Attendance</button>
+  </div>
+
+  <!-- ANOMALY ALERT BANNER -->
+  <div class="alert-box" id="anomalyAlert"></div>
+
+  <!-- ATTENDANCE TABLE -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Employee</th>
+          <th>Date</th>
+          <th>Check-in</th>
+          <th>Status</th>
+          <th>Flag</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="attBody"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+<script src="Java Script And CSS/app.js"></script>
+<script>checkAuth();</script>
+</body>
+</html>

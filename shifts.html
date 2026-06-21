@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Time Office — Shift Scheduling</title>
+  <link rel="stylesheet" href="Java Script And CSS/style.css" />
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-brand"><span>⏱</span> Time Office Automation</div>
+  <div class="topbar-right">
+    <div class="topbar-user" id="topbarUser"></div>
+    <button class="btn-logout" onclick="logout()">Sign Out</button>
+  </div>
+</div>
+
+<!-- NAV TABS -->
+<nav class="nav-tabs">
+  <a href="dashboard.html"  class="nav-tab">📊 Dashboard</a>
+  <a href="shifts.html"     class="nav-tab active">🤖 Shift Scheduling</a>
+  <a href="attendance.html" class="nav-tab">📋 Attendance</a>
+  <a href="payroll.html"    class="nav-tab">💰 Payroll</a>
+  <a href="settings.html"   class="nav-tab">⚙️ Settings</a>
+</nav>
+
+<!-- PAGE CONTENT -->
+<div class="page-content">
+
+  <div class="section-head">
+    <h2>🤖 AI Shift Scheduling</h2>
+    <div class="section-actions">
+      <div class="search-box form-field" style="min-width:200px;">
+        <input type="text" id="shiftSearch" placeholder="Search employee..." oninput="renderShifts()" />
+      </div>
+      <button class="btn btn-export" onclick="exportCSV('shifts')">⬇ Export CSV</button>
+    </div>
+  </div>
+
+  <!-- ADD SHIFT FORM -->
+  <div class="form-box">
+    <div class="form-field">
+      <label>Employee Name</label>
+      <input id="sEmp" placeholder="e.g. Ravi Kumar" />
+    </div>
+    <div class="form-field">
+      <label>Department</label>
+      <select id="sDept">
+        <option>Production</option>
+        <option>Quality</option>
+        <option>HR</option>
+        <option>Security</option>
+        <option>Maintenance</option>
+        <option>Admin</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label>Shift</label>
+      <select id="sType">
+        <option value="Morning">🌅 Morning (6AM–2PM)</option>
+        <option value="Afternoon">☀️ Afternoon (2PM–10PM)</option>
+        <option value="Night">🌙 Night (10PM–6AM)</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label>Date</label>
+      <input id="sDate" type="date" />
+    </div>
+    <button class="btn btn-primary" onclick="addShift()">+ Assign Shift</button>
+  </div>
+
+  <!-- SHIFTS TABLE -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Employee</th>
+          <th>Department</th>
+          <th>Shift</th>
+          <th>Date</th>
+          <th>AI Suggestion</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="shiftBody"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+<script src="Java Script And CSS/app.js"></script>
+<script>checkAuth();</script>
+</body>
+</html>
