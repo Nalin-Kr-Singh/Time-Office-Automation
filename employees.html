@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Time Office — Employees</title>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-brand"><span>⏱</span> Time Office</div>
+  <div class="topbar-right">
+    <div class="topbar-user" id="topbarUser"></div>
+    <button class="btn-logout" onclick="logout()">Sign Out</button>
+  </div>
+</div>
+<nav class="nav-tabs">
+  <a href="dashboard.html"  class="nav-tab">📊 Dashboard</a>
+  <a href="employees.html"  class="nav-tab active">👥 Employees</a>
+  <a href="attendance.html" class="nav-tab">📋 Attendance</a>
+  <a href="shifts.html"     class="nav-tab">🤖 Shifts</a>
+  <a href="payroll.html"    class="nav-tab">💰 Payroll</a>
+  <a href="settings.html"   class="nav-tab">⚙️ Settings</a>
+</nav>
+
+<div class="pg">
+  <div class="sec-head">
+    <h2>👥 Employee Enrollment</h2>
+    <div class="sec-acts">
+      <div class="search-wrap ff" style="min-width:200px">
+        <input type="text" id="empSearch" placeholder="Search name or ID…" oninput="renderEmployees()"/>
+      </div>
+      <select id="deptFilter" class="btn" style="font-size:.82rem;padding:7px 11px;border:1.5px solid var(--border);border-radius:8px;background:var(--surf);cursor:pointer" onchange="renderEmployees()">
+        <option value="">All Departments</option>
+        <option>Production</option><option>Quality</option><option>HR</option>
+        <option>Security</option><option>Maintenance</option><option>Admin</option><option>Finance</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ADD EMPLOYEE FORM -->
+  <div class="form-box">
+    <div class="ff"><label>Full Name *</label><input id="fName" placeholder="e.g. Ravi Kumar"/></div>
+    <div class="ff"><label>Employee ID *</label><input id="fEmpId" placeholder="e.g. EMP001"/></div>
+    <div class="ff"><label>Department</label>
+      <select id="fDept">
+        <option>Production</option><option>Quality</option><option>HR</option>
+        <option>Security</option><option>Maintenance</option><option>Admin</option><option>Finance</option>
+      </select>
+    </div>
+    <div class="ff"><label>Designation</label><input id="fDesig" placeholder="e.g. Operator"/></div>
+    <div class="ff"><label>Default Shift</label>
+      <select id="fShift">
+        <option value="Morning">🌅 Morning (6AM–2PM)</option>
+        <option value="Afternoon">☀️ Afternoon (2PM–10PM)</option>
+        <option value="Night">🌙 Night (10PM–6AM)</option>
+      </select>
+    </div>
+    <div class="ff"><label>Base Salary (₹)</label><input id="fSalary" type="number" placeholder="30000"/></div>
+    <div class="ff"><label>Phone</label><input id="fPhone" placeholder="9XXXXXXXXX"/></div>
+    <div class="ff"><label>Email</label><input id="fEmail" type="email" placeholder="ravi@company.com"/></div>
+    <div class="ff"><label>Join Date</label><input id="fJoin" type="date"/></div>
+    <button class="btn btn-primary" onclick="addEmployee()">+ Enroll Employee</button>
+  </div>
+
+  <!-- EMPLOYEES TABLE -->
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Employee</th><th>Department</th><th>Designation</th>
+          <th>Shift</th><th>Base Salary</th><th>Phone</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="empBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <h3>✏️ Edit Employee</h3>
+    <input type="hidden" id="mEmpId"/>
+    <div class="form-box" style="box-shadow:none;padding:0;margin:0;background:transparent">
+      <div class="ff"><label>Full Name</label><input id="mName"/></div>
+      <div class="ff"><label>Employee ID</label><input id="mEmpNo"/></div>
+      <div class="ff"><label>Department</label>
+        <select id="mDept">
+          <option>Production</option><option>Quality</option><option>HR</option>
+          <option>Security</option><option>Maintenance</option><option>Admin</option><option>Finance</option>
+        </select>
+      </div>
+      <div class="ff"><label>Designation</label><input id="mDesig"/></div>
+      <div class="ff"><label>Default Shift</label>
+        <select id="mShift">
+          <option value="Morning">🌅 Morning</option>
+          <option value="Afternoon">☀️ Afternoon</option>
+          <option value="Night">🌙 Night</option>
+        </select>
+      </div>
+      <div class="ff"><label>Base Salary (₹)</label><input id="mSalary" type="number"/></div>
+      <div class="ff"><label>Phone</label><input id="mPhone"/></div>
+      <div class="ff"><label>Email</label><input id="mEmail" type="email"/></div>
+      <div class="ff"><label>Join Date</label><input id="mJoin" type="date"/></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" style="background:var(--border);color:var(--ink)" onclick="closeEditModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEditModal()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script src="app.js"></script>
+<script>
+checkAuth();
+
+function addEmployee(){
+  const name   = get('fName').value.trim();
+  const empId  = get('fEmpId').value.trim();
+  if(!name||!empId){ toast('⚠ Name and Employee ID are required','#dc3545'); return; }
+  const existing = ls.get('employees').find(e=>e.empId===empId);
+  if(existing){ toast('⚠ Employee ID already exists','#dc3545'); return; }
+  const emp = {
+    id:          Date.now(),
+    name, empId,
+    dept:        get('fDept').value,
+    designation: get('fDesig').value.trim(),
+    shift:       get('fShift').value,
+    baseSalary:  parseFloat(get('fSalary').value)||0,
+    phone:       get('fPhone').value.trim(),
+    email:       get('fEmail').value.trim(),
+    joinDate:    get('fJoin').value,
+    createdAt:   new Date().toISOString()
+  };
+  const list = ls.get('employees');
+  list.push(emp);
+  ls.set('employees', list);
+  // Clear form
+  ['fName','fEmpId','fDesig','fSalary','fPhone','fEmail','fJoin'].forEach(id=>get(id).value='');
+  renderEmployees();
+  toast('✓ '+name+' enrolled successfully','#1a9e6e');
+}
+</script>
+</body>
+</html>

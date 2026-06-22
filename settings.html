@@ -1,84 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Time Office — Settings</title>
-  <link rel="stylesheet" href="Java Script And CSS/style.css" />
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Time Office — Settings</title>
+<link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-
-<!-- TOPBAR -->
 <div class="topbar">
-  <div class="topbar-brand"><span>⏱</span> Time Office Automation</div>
+  <div class="topbar-brand"><span>⏱</span> Time Office</div>
   <div class="topbar-right">
     <div class="topbar-user" id="topbarUser"></div>
     <button class="btn-logout" onclick="logout()">Sign Out</button>
   </div>
 </div>
-
-<!-- NAV TABS -->
 <nav class="nav-tabs">
   <a href="dashboard.html"  class="nav-tab">📊 Dashboard</a>
-  <a href="shifts.html"     class="nav-tab">🤖 Shift Scheduling</a>
+  <a href="employees.html"  class="nav-tab">👥 Employees</a>
   <a href="attendance.html" class="nav-tab">📋 Attendance</a>
+  <a href="shifts.html"     class="nav-tab">🤖 Shifts</a>
   <a href="payroll.html"    class="nav-tab">💰 Payroll</a>
   <a href="settings.html"   class="nav-tab active">⚙️ Settings</a>
 </nav>
 
-<!-- PAGE CONTENT -->
-<div class="page-content">
+<div class="pg">
+  <div class="sec-head"><h2>⚙️ Settings</h2></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px">
 
-  <div class="section-head">
-    <h2>⚙️ Settings</h2>
-  </div>
-
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;">
-
-    <!-- CHANGE PIN -->
-    <div class="settings-card">
+    <div class="set-card">
       <h3>🔐 Change PIN</h3>
-      <div class="form-field">
-        <label>Current PIN</label>
-        <input type="password" id="oldPin" maxlength="4" placeholder="Current PIN" />
-      </div>
-      <div class="form-field">
-        <label>New PIN (4 digits)</label>
-        <input type="password" id="newPin" maxlength="4" placeholder="New PIN" />
-      </div>
-      <div class="form-field">
-        <label>Confirm New PIN</label>
-        <input type="password" id="confirmPin" maxlength="4" placeholder="Confirm PIN" />
-      </div>
+      <div class="ff"><label>Current PIN</label><input type="password" id="oldPin" maxlength="4" placeholder="Current PIN"/></div>
+      <div class="ff"><label>New PIN (4 digits)</label><input type="password" id="newPin" maxlength="4" placeholder="New PIN"/></div>
+      <div class="ff"><label>Confirm New PIN</label><input type="password" id="confirmPin" maxlength="4" placeholder="Confirm PIN"/></div>
       <button class="btn btn-primary" onclick="changePin()">Update PIN</button>
-      <div id="pinMsg" style="margin-top:10px;font-size:0.83rem;"></div>
+      <div id="pinMsg" style="margin-top:10px;font-size:.82rem"></div>
     </div>
 
-    <!-- PROFILE -->
-    <div class="settings-card">
+    <div class="set-card">
       <h3>👤 Profile</h3>
-      <div class="form-field">
-        <label>Admin Name</label>
-        <input id="adminName" placeholder="Your name" />
-      </div>
-      <div class="form-field">
-        <label>Organization</label>
-        <input id="orgName" placeholder="Company name" />
-      </div>
+      <div class="ff"><label>Admin Name</label><input id="adminName" placeholder="Your name"/></div>
+      <div class="ff"><label>Organization</label><input id="orgName" placeholder="Company name"/></div>
       <button class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
     </div>
 
-    <!-- DATA MANAGEMENT -->
-    <div class="settings-card">
+    <div class="set-card">
       <h3>🗑 Data Management</h3>
-      <p style="font-size:0.85rem;color:#888;margin-bottom:16px;">
-        Clear stored data permanently. This cannot be undone — export CSV first if needed.
-      </p>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <button class="btn" style="background:#fde8e6;color:#c0392b;" onclick="clearData('shifts')">Clear Shifts</button>
-        <button class="btn" style="background:#fde8e6;color:#c0392b;" onclick="clearData('attendance')">Clear Attendance</button>
-        <button class="btn" style="background:#fde8e6;color:#c0392b;" onclick="clearData('payroll')">Clear Payroll</button>
-        <button class="btn" style="background:#c0392b;color:#fff;"    onclick="clearData('all')">Clear All Data</button>
+      <p style="font-size:.83rem;color:#888;margin-bottom:14px">Permanently clear stored data. Export CSV first as backup.</p>
+      <div style="display:flex;gap:9px;flex-wrap:wrap">
+        <button class="btn" style="background:#fde8e6;color:#a32020" onclick="clearData('employees')">Clear Employees</button>
+        <button class="btn" style="background:#fde8e6;color:#a32020" onclick="clearData('attendance')">Clear Attendance</button>
+        <button class="btn" style="background:#dc3545;color:#fff" onclick="clearData('all')">Clear All Data</button>
       </div>
     </div>
 
@@ -86,7 +56,7 @@
 </div>
 
 <div id="toast"></div>
-<script src="Java Script And CSS/app.js"></script>
+<script src="app.js"></script>
 <script>checkAuth();</script>
 </body>
 </html>

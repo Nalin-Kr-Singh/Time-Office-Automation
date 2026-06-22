@@ -1,26 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Time Office Automation — Login</title>
-  <link rel="stylesheet" href="Java Script And CSS/style.css" />
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Time Office — Login</title>
+<link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-
-<div id="loginScreen">
+<div id="loginWrap">
   <div class="login-card">
-    <div class="logo">⏱</div>
-    <h1>Time Office Automation</h1>
+    <div class="ico">⏱</div>
+    <h1>Time Office</h1>
     <p>Enter your 4-digit PIN to continue</p>
-
     <div class="pin-dots">
       <div class="pin-dot" id="d0"></div>
       <div class="pin-dot" id="d1"></div>
       <div class="pin-dot" id="d2"></div>
       <div class="pin-dot" id="d3"></div>
     </div>
-
     <div class="pin-grid">
       <button class="pin-btn" onclick="pinPress('1')">1</button>
       <button class="pin-btn" onclick="pinPress('2')">2</button>
@@ -34,13 +30,11 @@
       <button class="pin-btn" onclick="pinPress('0')">0</button>
       <button class="pin-btn" onclick="pinClear()">⌫</button>
     </div>
-
-    <div class="login-error" id="loginError"></div>
-    <div class="login-hint">Default PIN: <strong>1234</strong></div>
+    <div class="pin-err" id="pinErr"></div>
+    <div class="pin-hint">Default PIN: <strong>1234</strong></div>
   </div>
 </div>
-
 <div id="toast"></div>
-<script src="Java Script And CSS/app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

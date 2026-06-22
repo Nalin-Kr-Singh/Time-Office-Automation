@@ -1,107 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Time Office — Payroll</title>
-  <link rel="stylesheet" href="Java Script And CSS/style.css" />
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Time Office — Payroll</title>
+<link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-
-<!-- TOPBAR -->
 <div class="topbar">
-  <div class="topbar-brand"><span>⏱</span> Time Office Automation</div>
+  <div class="topbar-brand"><span>⏱</span> Time Office</div>
   <div class="topbar-right">
     <div class="topbar-user" id="topbarUser"></div>
     <button class="btn-logout" onclick="logout()">Sign Out</button>
   </div>
 </div>
-
-<!-- NAV TABS -->
 <nav class="nav-tabs">
   <a href="dashboard.html"  class="nav-tab">📊 Dashboard</a>
-  <a href="shifts.html"     class="nav-tab">🤖 Shift Scheduling</a>
+  <a href="employees.html"  class="nav-tab">👥 Employees</a>
   <a href="attendance.html" class="nav-tab">📋 Attendance</a>
+  <a href="shifts.html"     class="nav-tab">🤖 Shifts</a>
   <a href="payroll.html"    class="nav-tab active">💰 Payroll</a>
   <a href="settings.html"   class="nav-tab">⚙️ Settings</a>
 </nav>
 
-<!-- PAGE CONTENT -->
-<div class="page-content">
-
-  <div class="section-head">
-    <h2>💰 Payroll Support</h2>
-    <div class="section-actions">
-      <div class="search-box form-field" style="min-width:200px;">
-        <input type="text" id="paySearch" placeholder="Search employee..." oninput="renderPayroll()" />
+<div class="pg">
+  <div class="sec-head">
+    <h2>💰 Payroll</h2>
+    <div class="sec-acts">
+      <div class="search-wrap ff" style="min-width:180px">
+        <input type="text" id="paySearch" placeholder="Search employee…" oninput="renderPayrollPage()"/>
       </div>
-      <button class="btn btn-export" onclick="exportCSV('payroll')">⬇ Export CSV</button>
+      <input type="month" id="payMonth" style="font-size:.84rem;padding:7px 11px;border:1.5px solid var(--border);border-radius:8px;background:var(--surf)" onchange="renderPayrollPage()"/>
+      <button class="btn btn-export" onclick="exportAllPayroll()">⬇ Export All CSV</button>
     </div>
   </div>
 
-  <!-- CALCULATE PAYROLL FORM -->
-  <div class="form-box">
-    <div class="form-field">
-      <label>Employee Name</label>
-      <input id="pEmp" placeholder="e.g. Amit Verma" />
-    </div>
-    <div class="form-field">
-      <label>Base Salary (₹)</label>
-      <input id="pBase" type="number" placeholder="30000" />
-    </div>
-    <div class="form-field">
-      <label>Days Worked</label>
-      <input id="pWorked" type="number" placeholder="22" />
-    </div>
-    <div class="form-field">
-      <label>Total Working Days</label>
-      <input id="pTotal" type="number" placeholder="26" />
-    </div>
-    <div class="form-field">
-      <label>Overtime Hours</label>
-      <input id="pOT" type="number" placeholder="0" />
-    </div>
-    <div class="form-field">
-      <label>Deductions (₹)</label>
-      <input id="pDed" type="number" placeholder="0" />
-    </div>
-    <button class="btn btn-primary" onclick="calculatePayroll()">Calculate & Save</button>
+  <!-- FORMULA INFO -->
+  <div style="background:var(--surf);border-radius:var(--radius);padding:14px 18px;margin-bottom:18px;box-shadow:var(--sh);font-size:.81rem;color:#666;display:flex;flex-wrap:wrap;gap:14px">
+    <span>📌 <strong>Basic Pay</strong> = (Base ÷ 26 days) × Days Present</span>
+    <span>📌 <strong>Overtime</strong> = (Base ÷ 26 ÷ 8h) × 1.5 × OT hours</span>
+    <span>📌 <strong>Late Deduct</strong> = Half-day per late after 3rd occurrence</span>
+    <span>📌 <strong>Net Pay</strong> = Basic + OT − Absent Deduct − Late Deduct</span>
   </div>
 
-  <!-- LIVE RESULT CARD -->
-  <div class="payroll-result" id="payResult">
-    <div style="font-size:0.8rem;opacity:0.7;margin-bottom:4px;">NET PAY</div>
-    <div class="net-pay" id="payNetDisplay">₹0</div>
-    <div class="pay-breakdown">
-      <div class="pay-item">Basic Pay<span id="payBasicDisp">₹0</span></div>
-      <div class="pay-item">Overtime<span id="payOTDisp">₹0</span></div>
-      <div class="pay-item">Deductions<span id="payDedDisp">₹0</span></div>
-    </div>
-  </div>
-
-  <!-- PAYROLL TABLE -->
-  <div class="table-wrap">
+  <!-- PAYROLL TABLE (auto-calculated from attendance + enrollment data) -->
+  <div class="tbl-wrap">
     <table>
       <thead>
         <tr>
-          <th>#</th>
-          <th>Employee</th>
-          <th>Base Salary</th>
-          <th>Days Worked</th>
-          <th>Overtime</th>
-          <th>Deductions</th>
-          <th>Net Pay</th>
-          <th>Action</th>
+          <th>#</th><th>Employee</th><th>Dept</th>
+          <th>Days Present</th><th>Absent</th><th>OT Hours</th>
+          <th>Basic Pay</th><th>OT Pay</th><th>Deductions</th>
+          <th>Net Pay</th><th>Actions</th>
         </tr>
       </thead>
-      <tbody id="payBody"></tbody>
+      <tbody id="payTableBody"></tbody>
     </table>
   </div>
+</div>
 
+<!-- PAY SLIP MODAL -->
+<div class="modal-overlay" id="paySlipModal">
+  <div class="modal" style="max-width:480px">
+    <h3>📄 Pay Slip</h3>
+    <div id="slipContent"></div>
+    <div class="modal-foot">
+      <button class="btn" style="background:var(--border);color:var(--ink)" onclick="closePaySlip()">Close</button>
+      <button class="btn btn-export" onclick="window.print()">🖨 Print</button>
+    </div>
+  </div>
 </div>
 
 <div id="toast"></div>
-<script src="Java Script And CSS/app.js"></script>
+<script src="app.js"></script>
 <script>checkAuth();</script>
 </body>
 </html>

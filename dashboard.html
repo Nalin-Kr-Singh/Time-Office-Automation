@@ -1,149 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Time Office — Dashboard</title>
-  <link rel="stylesheet" href="Java Script And CSS/style.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Time Office — Dashboard</title>
+<link rel="stylesheet" href="style.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
-
-<!-- TOPBAR -->
 <div class="topbar">
-  <div class="topbar-brand"><span>⏱</span> Time Office Automation</div>
+  <div class="topbar-brand"><span>⏱</span> Time Office</div>
   <div class="topbar-right">
     <div class="topbar-user" id="topbarUser"></div>
     <button class="btn-logout" onclick="logout()">Sign Out</button>
   </div>
 </div>
-
-<!-- NAV TABS -->
 <nav class="nav-tabs">
   <a href="dashboard.html"  class="nav-tab active">📊 Dashboard</a>
-  <a href="shifts.html"     class="nav-tab">🤖 Shift Scheduling</a>
+  <a href="employees.html"  class="nav-tab">👥 Employees</a>
   <a href="attendance.html" class="nav-tab">📋 Attendance</a>
+  <a href="shifts.html"     class="nav-tab">🤖 Shifts</a>
   <a href="payroll.html"    class="nav-tab">💰 Payroll</a>
   <a href="settings.html"   class="nav-tab">⚙️ Settings</a>
 </nav>
 
-<!-- PAGE CONTENT -->
-<div class="page-content">
-
-  <!-- STAT CARDS -->
+<div class="pg">
   <div class="stat-grid">
     <div class="stat-card">
-      <div class="stat-label">Total Employees</div>
-      <div class="stat-value" id="ds-emp">0</div>
-      <div class="stat-sub">Registered</div>
+      <div class="lbl">Total Employees</div>
+      <div class="val" id="dsTotalEmp">0</div>
+      <div class="sub">Enrolled</div>
     </div>
-    <div class="stat-card" style="border-left-color:#27ae60">
-      <div class="stat-label">Shifts Assigned</div>
-      <div class="stat-value" id="ds-shifts">0</div>
-      <div class="stat-sub">All time</div>
+    <div class="stat-card" style="border-left-color:#1a9e6e">
+      <div class="lbl">Present Today</div>
+      <div class="val" id="dsPresentToday">0</div>
+      <div class="sub">Checked in</div>
     </div>
-    <div class="stat-card" style="border-left-color:#e74c3c">
-      <div class="stat-label">Anomalies Detected</div>
-      <div class="stat-value" id="ds-anom">0</div>
-      <div class="stat-sub">Attendance flags</div>
+    <div class="stat-card" style="border-left-color:#dc3545">
+      <div class="lbl">Absent Today</div>
+      <div class="val" id="dsAbsent">0</div>
+      <div class="sub">Not checked in</div>
     </div>
-    <div class="stat-card" style="border-left-color:#8e44ad">
-      <div class="stat-label">Payroll Processed</div>
-      <div class="stat-value" id="ds-payroll">0</div>
-      <div class="stat-sub">Records</div>
+    <div class="stat-card" style="border-left-color:#f39c12">
+      <div class="lbl">Anomalies</div>
+      <div class="val" id="dsAnomalies">0</div>
+      <div class="sub">Employees flagged</div>
     </div>
   </div>
 
-  <!-- CHARTS -->
   <div class="charts-row">
     <div class="chart-card">
-      <h3>Attendance Status Breakdown</h3>
+      <h3>Overall Attendance Breakdown</h3>
       <canvas id="chartAtt" height="200"></canvas>
     </div>
     <div class="chart-card">
-      <h3>Shift Distribution</h3>
+      <h3>Employees by Shift</h3>
       <canvas id="chartShift" height="200"></canvas>
     </div>
   </div>
 
+  <!-- Quick links -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:22px">
+    <a href="employees.html" style="text-decoration:none">
+      <div style="background:var(--surf);border-radius:var(--radius);padding:18px;box-shadow:var(--sh);border-left:4px solid var(--blue);cursor:pointer">
+        <div style="font-size:1.5rem;margin-bottom:6px">👥</div>
+        <div style="font-weight:700;font-size:.95rem">Enroll Employee</div>
+        <div style="font-size:.78rem;color:#888;margin-top:3px">Add or manage employees</div>
+      </div>
+    </a>
+    <a href="attendance.html" style="text-decoration:none">
+      <div style="background:var(--surf);border-radius:var(--radius);padding:18px;box-shadow:var(--sh);border-left:4px solid var(--green);cursor:pointer">
+        <div style="font-size:1.5rem;margin-bottom:6px">📋</div>
+        <div style="font-weight:700;font-size:.95rem">Mark Attendance</div>
+        <div style="font-size:.78rem;color:#888;margin-top:3px">Check-in / Check-out</div>
+      </div>
+    </a>
+    <a href="shifts.html" style="text-decoration:none">
+      <div style="background:var(--surf);border-radius:var(--radius);padding:18px;box-shadow:var(--sh);border-left:4px solid var(--warn);cursor:pointer">
+        <div style="font-size:1.5rem;margin-bottom:6px">🤖</div>
+        <div style="font-weight:700;font-size:.95rem">Manage Shifts</div>
+        <div style="font-size:.78rem;color:#888;margin-top:3px">Assign & track shifts</div>
+      </div>
+    </a>
+    <a href="payroll.html" style="text-decoration:none">
+      <div style="background:var(--surf);border-radius:var(--radius);padding:18px;box-shadow:var(--sh);border-left:4px solid var(--purple);cursor:pointer">
+        <div style="font-size:1.5rem;margin-bottom:6px">💰</div>
+        <div style="font-weight:700;font-size:.95rem">View Payroll</div>
+        <div style="font-size:.78rem;color:#888;margin-top:3px">Auto-calculated salaries</div>
+      </div>
+    </a>
+  </div>
 </div>
 
 <div id="toast"></div>
-<script src="Java Script And CSS/app.js"></script>
-<script>
-  // Auth guard
-  checkAuth();
-
-  // Dashboard stats & charts
-  let chartAtt = null, chartShift = null;
-
-  function refreshDashboard() {
-    const shifts = ls.get('shifts');
-    const att    = ls.get('attendance');
-    const pay    = ls.get('payroll');
-
-    const empNames = new Set([
-      ...shifts.map(s => s.name),
-      ...att.map(a => a.name),
-      ...pay.map(p => p.name)
-    ]);
-
-    get('ds-emp').textContent     = empNames.size;
-    get('ds-shifts').textContent  = shifts.length;
-    get('ds-payroll').textContent = pay.length;
-
-    // Count employees with anomalies
-    const anomEmp = new Set();
-    empNames.forEach(emp => {
-      const recs = att.filter(r => r.name === emp);
-      if (
-        recs.filter(r => r.status === 'Absent').length >= 3 ||
-        recs.filter(r => r.status === 'Late').length   >= 3
-      ) anomEmp.add(emp);
-    });
-    get('ds-anom').textContent = anomEmp.size;
-
-    // Attendance doughnut chart
-    const statusCounts = { Present: 0, Absent: 0, Late: 0, 'Half Day': 0 };
-    att.forEach(r => { if (statusCounts[r.status] !== undefined) statusCounts[r.status]++; });
-    if (chartAtt) chartAtt.destroy();
-    chartAtt = new Chart(get('chartAtt'), {
-      type: 'doughnut',
-      data: {
-        labels: Object.keys(statusCounts),
-        datasets: [{
-          data: Object.values(statusCounts),
-          backgroundColor: ['#27ae60', '#e74c3c', '#f39c12', '#3498db'],
-          borderWidth: 2
-        }]
-      },
-      options: { plugins: { legend: { position: 'bottom' } }, cutout: '65%' }
-    });
-
-    // Shift bar chart
-    const shiftCounts = { Morning: 0, Afternoon: 0, Night: 0 };
-    shifts.forEach(s => { if (shiftCounts[s.type] !== undefined) shiftCounts[s.type]++; });
-    if (chartShift) chartShift.destroy();
-    chartShift = new Chart(get('chartShift'), {
-      type: 'bar',
-      data: {
-        labels: Object.keys(shiftCounts),
-        datasets: [{
-          label: 'Shifts',
-          data: Object.values(shiftCounts),
-          backgroundColor: ['#3498db', '#f39c12', '#2c3e50'],
-          borderRadius: 8
-        }]
-      },
-      options: {
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
-      }
-    });
-  }
-
-  // Run on load
-  refreshDashboard();
-</script>
+<script src="app.js"></script>
+<script>checkAuth(); refreshDashboard();</script>
 </body>
 </html>

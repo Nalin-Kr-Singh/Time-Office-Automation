@@ -1,98 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Time Office — Shift Scheduling</title>
-  <link rel="stylesheet" href="Java Script And CSS/style.css" />
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Time Office — Shifts</title>
+<link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-
-<!-- TOPBAR -->
 <div class="topbar">
-  <div class="topbar-brand"><span>⏱</span> Time Office Automation</div>
+  <div class="topbar-brand"><span>⏱</span> Time Office</div>
   <div class="topbar-right">
     <div class="topbar-user" id="topbarUser"></div>
     <button class="btn-logout" onclick="logout()">Sign Out</button>
   </div>
 </div>
-
-<!-- NAV TABS -->
 <nav class="nav-tabs">
   <a href="dashboard.html"  class="nav-tab">📊 Dashboard</a>
-  <a href="shifts.html"     class="nav-tab active">🤖 Shift Scheduling</a>
+  <a href="employees.html"  class="nav-tab">👥 Employees</a>
   <a href="attendance.html" class="nav-tab">📋 Attendance</a>
+  <a href="shifts.html"     class="nav-tab active">🤖 Shifts</a>
   <a href="payroll.html"    class="nav-tab">💰 Payroll</a>
   <a href="settings.html"   class="nav-tab">⚙️ Settings</a>
 </nav>
 
-<!-- PAGE CONTENT -->
-<div class="page-content">
+<div class="pg">
+  <div class="sec-head">
+    <h2>🤖 Shift Management</h2>
+  </div>
 
-  <div class="section-head">
-    <h2>🤖 AI Shift Scheduling</h2>
-    <div class="section-actions">
-      <div class="search-box form-field" style="min-width:200px;">
-        <input type="text" id="shiftSearch" placeholder="Search employee..." oninput="renderShifts()" />
+  <!-- SEARCH + SHIFT EDITOR -->
+  <div class="form-box" style="align-items:flex-start">
+    <div class="ff ac-wrap" style="max-width:320px">
+      <label>Search Employee</label>
+      <input id="shiftEmpSearch" placeholder="Type name or ID…" autocomplete="off"/>
+      <div class="ac-drop" id="shiftEmpDrop"></div>
+    </div>
+  </div>
+
+  <!-- EMPLOYEE SHIFT CARD -->
+  <div class="emp-card" id="empShiftCard">
+    <div class="emp-card-head">
+      <div class="emp-avatar" id="shiftAvatar">?</div>
+      <div>
+        <div class="emp-name" id="shiftEmpName"></div>
+        <div class="emp-meta" id="shiftEmpMeta"></div>
       </div>
-      <button class="btn btn-export" onclick="exportCSV('shifts')">⬇ Export CSV</button>
+    </div>
+
+    <div style="display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px">
+      <div class="ff" style="max-width:260px">
+        <label>Assign Shift</label>
+        <select id="shiftSelect" onchange="updateShiftPreview(this.value)">
+          <option value="Morning">🌅 Morning (6AM – 2PM)</option>
+          <option value="Afternoon">☀️ Afternoon (2PM – 10PM)</option>
+          <option value="Night">🌙 Night (10PM – 6AM)</option>
+        </select>
+      </div>
+      <button class="btn btn-green" id="saveShiftBtn">Save Shift</button>
+    </div>
+
+    <!-- Shift preview -->
+    <div class="shift-info" id="shiftPreview"></div>
+
+    <!-- This month's work summary from attendance -->
+    <div style="margin-top:16px">
+      <div style="font-size:.78rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">This Month's Attendance Summary</div>
+      <div id="shiftAttSummary" style="display:flex;flex-wrap:wrap;gap:10px;font-size:.82rem"></div>
     </div>
   </div>
 
-  <!-- ADD SHIFT FORM -->
-  <div class="form-box">
-    <div class="form-field">
-      <label>Employee Name</label>
-      <input id="sEmp" placeholder="e.g. Ravi Kumar" />
-    </div>
-    <div class="form-field">
-      <label>Department</label>
-      <select id="sDept">
-        <option>Production</option>
-        <option>Quality</option>
-        <option>HR</option>
-        <option>Security</option>
-        <option>Maintenance</option>
-        <option>Admin</option>
-      </select>
-    </div>
-    <div class="form-field">
-      <label>Shift</label>
-      <select id="sType">
-        <option value="Morning">🌅 Morning (6AM–2PM)</option>
-        <option value="Afternoon">☀️ Afternoon (2PM–10PM)</option>
-        <option value="Night">🌙 Night (10PM–6AM)</option>
-      </select>
-    </div>
-    <div class="form-field">
-      <label>Date</label>
-      <input id="sDate" type="date" />
-    </div>
-    <button class="btn btn-primary" onclick="addShift()">+ Assign Shift</button>
+  <!-- ALL EMPLOYEES SHIFT TABLE -->
+  <div class="sec-head" style="margin-top:8px">
+    <h2 style="font-size:1rem">Today's Shift Overview</h2>
   </div>
-
-  <!-- SHIFTS TABLE -->
-  <div class="table-wrap">
+  <div class="tbl-wrap">
     <table>
       <thead>
         <tr>
-          <th>#</th>
-          <th>Employee</th>
-          <th>Department</th>
-          <th>Shift</th>
-          <th>Date</th>
-          <th>AI Suggestion</th>
-          <th>Action</th>
+          <th>#</th><th>Employee</th><th>Dept</th><th>Shift</th>
+          <th>Today Check-in → Out</th><th>Worked Today</th><th>Month OT</th>
         </tr>
       </thead>
-      <tbody id="shiftBody"></tbody>
+      <tbody id="shiftTableBody"></tbody>
     </table>
   </div>
-
 </div>
 
 <div id="toast"></div>
-<script src="Java Script And CSS/app.js"></script>
-<script>checkAuth();</script>
+<script src="app.js"></script>
+<script>
+checkAuth();
+
+let _selectedShiftEmp = null;
+
+window.onEmpSelected = function(emp){
+  _selectedShiftEmp = emp;
+  renderEmpShiftCard(emp);
+  renderShiftAttSummary(emp);
+};
+
+setupSearch('shiftEmpSearch','shiftEmpDrop', emp=>{
+  _selectedShiftEmp = emp;
+  renderEmpShiftCard(emp);
+  renderShiftAttSummary(emp);
+});
+
+function renderShiftAttSummary(emp){
+  const wrap = get('shiftAttSummary'); if(!wrap) return;
+  const month = todayStr().slice(0,7);
+  const att   = ls.get('attendance').filter(r=>r.empId===emp.empId && r.date.startsWith(month));
+
+  const present = att.filter(r=>r.status==='Present'||r.status==='Late').length;
+  const absent  = att.filter(r=>r.status==='Absent').length;
+  const late    = att.filter(r=>r.status==='Late').length;
+  const totalWorked = att.reduce((s,r)=>s+(r.workedMins||0),0);
+  const totalOT     = att.reduce((s,r)=>s+(r.otMins||0),0);
+
+  wrap.innerHTML = `
+    <div style="background:var(--bg);border-radius:8px;padding:8px 12px"><span style="font-weight:700">${present}</span> Present</div>
+    <div style="background:var(--bg);border-radius:8px;padding:8px 12px"><span style="font-weight:700">${absent}</span> Absent</div>
+    <div style="background:var(--bg);border-radius:8px;padding:8px 12px"><span style="font-weight:700">${late}</span> Late</div>
+    <div style="background:var(--bg);border-radius:8px;padding:8px 12px"><span style="font-weight:700">${fmtDuration(totalWorked)}</span> Total Hours</div>
+    <div style="background:#ede8ff;border-radius:8px;padding:8px 12px"><span style="font-weight:700;color:#3d1f9c">${fmtDuration(totalOT)}</span> Overtime</div>
+  `;
+}
+</script>
 </body>
 </html>

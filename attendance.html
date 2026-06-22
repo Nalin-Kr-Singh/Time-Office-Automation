@@ -1,104 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Time Office — Attendance</title>
-  <link rel="stylesheet" href="Java Script And CSS/style.css" />
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Time Office — Attendance</title>
+<link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-
-<!-- TOPBAR -->
 <div class="topbar">
-  <div class="topbar-brand"><span>⏱</span> Time Office Automation</div>
+  <div class="topbar-brand"><span>⏱</span> Time Office</div>
   <div class="topbar-right">
     <div class="topbar-user" id="topbarUser"></div>
     <button class="btn-logout" onclick="logout()">Sign Out</button>
   </div>
 </div>
-
-<!-- NAV TABS -->
 <nav class="nav-tabs">
   <a href="dashboard.html"  class="nav-tab">📊 Dashboard</a>
-  <a href="shifts.html"     class="nav-tab">🤖 Shift Scheduling</a>
+  <a href="employees.html"  class="nav-tab">👥 Employees</a>
   <a href="attendance.html" class="nav-tab active">📋 Attendance</a>
+  <a href="shifts.html"     class="nav-tab">🤖 Shifts</a>
   <a href="payroll.html"    class="nav-tab">💰 Payroll</a>
   <a href="settings.html"   class="nav-tab">⚙️ Settings</a>
 </nav>
 
-<!-- PAGE CONTENT -->
-<div class="page-content">
+<div class="pg">
+  <div class="sec-head">
+    <h2>📋 Attendance</h2>
+    <div class="sec-acts">
+      <button class="btn btn-export" onclick="exportAttCSV()">⬇ Export CSV</button>
+    </div>
+  </div>
 
-  <div class="section-head">
-    <h2>📋 Attendance Anomaly Detection</h2>
-    <div class="section-actions">
-      <div class="search-box form-field" style="min-width:200px;">
-        <input type="text" id="attSearch" placeholder="Search employee..." oninput="renderAttendance()" />
+  <!-- SEARCH + CHECK IN -->
+  <div class="form-box" style="align-items:flex-start">
+    <div class="ff ac-wrap" style="max-width:340px">
+      <label>Search Employee (name or ID)</label>
+      <input id="attEmpSearch" placeholder="Type name…" autocomplete="off"/>
+      <div class="ac-drop" id="attEmpDrop"></div>
+    </div>
+    <div class="ff" style="min-width:120px;max-width:160px">
+      <label>Today</label>
+      <input type="text" id="todayDisplay" readonly style="background:var(--bg);font-weight:600"/>
+    </div>
+    <div class="ff" style="min-width:100px;max-width:130px">
+      <label>Time now</label>
+      <input type="text" id="timeDisplay" readonly style="background:var(--bg);font-weight:600"/>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;justify-content:flex-end;padding-top:20px">
+      <button class="btn btn-warn btn-sm" onclick="markAbsent()">Mark Absent</button>
+    </div>
+  </div>
+
+  <!-- EMPLOYEE CARD (shown after search) -->
+  <div class="emp-card" id="empAttCard">
+    <div class="emp-card-head">
+      <div class="emp-avatar" id="attAvatar">?</div>
+      <div>
+        <div class="emp-name" id="attEmpName"></div>
+        <div class="emp-meta" id="attEmpMeta"></div>
       </div>
-      <select id="attFilter"
-        style="font-size:0.83rem;padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface);cursor:pointer;"
-        onchange="renderAttendance()">
-        <option value="">All Statuses</option>
-        <option value="Present">Present</option>
-        <option value="Absent">Absent</option>
-        <option value="Late">Late</option>
-        <option value="Half Day">Half Day</option>
-      </select>
-      <button class="btn btn-export" onclick="exportCSV('attendance')">⬇ Export CSV</button>
     </div>
+    <div class="emp-details" id="attEmpDetails"></div>
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <button class="checkin-btn" id="checkinBtn">🟢 Check In</button>
+      <div style="font-size:.82rem;color:#888" id="attShiftInfo"></div>
+    </div>
+    <div id="todayLogWrap"></div>
   </div>
 
-  <!-- LOG ATTENDANCE FORM -->
-  <div class="form-box">
-    <div class="form-field">
-      <label>Employee Name</label>
-      <input id="aEmp" placeholder="e.g. Priya Sharma" />
-    </div>
-    <div class="form-field">
-      <label>Date</label>
-      <input id="aDate" type="date" />
-    </div>
-    <div class="form-field">
-      <label>Status</label>
-      <select id="aStatus">
-        <option value="Present">✅ Present</option>
-        <option value="Absent">❌ Absent</option>
-        <option value="Late">⏰ Late</option>
-        <option value="Half Day">🌗 Half Day</option>
-      </select>
-    </div>
-    <div class="form-field">
-      <label>Check-in Time</label>
-      <input id="aTime" type="time" />
-    </div>
-    <button class="btn btn-primary" onclick="addAttendance()">+ Log Attendance</button>
-  </div>
-
-  <!-- ANOMALY ALERT BANNER -->
+  <!-- ANOMALY ALERT -->
   <div class="alert-box" id="anomalyAlert"></div>
 
-  <!-- ATTENDANCE TABLE -->
-  <div class="table-wrap">
+  <!-- RECORDS TABLE -->
+  <div class="sec-head" style="margin-top:8px">
+    <h2 style="font-size:1rem">Attendance Records</h2>
+    <div class="sec-acts">
+      <div class="search-wrap ff" style="min-width:180px">
+        <input type="text" id="attSearch2" placeholder="Search employee…" oninput="renderAttTable()"/>
+      </div>
+      <select id="attFilter" style="font-size:.82rem;padding:7px 11px;border:1.5px solid var(--border);border-radius:8px;background:var(--surf);cursor:pointer" onchange="renderAttTable()">
+        <option value="">All Statuses</option>
+        <option value="Present">Present</option>
+        <option value="Late">Late</option>
+        <option value="Absent">Absent</option>
+      </select>
+      <input type="date" id="attDateFilter" style="font-size:.82rem;padding:7px 11px;border:1.5px solid var(--border);border-radius:8px;background:var(--surf)" onchange="renderAttTable()"/>
+    </div>
+  </div>
+  <div class="tbl-wrap">
     <table>
       <thead>
         <tr>
-          <th>#</th>
-          <th>Employee</th>
-          <th>Date</th>
-          <th>Check-in</th>
-          <th>Status</th>
-          <th>Flag</th>
-          <th>Action</th>
+          <th>#</th><th>Employee</th><th>Date</th><th>Dept</th><th>Shift</th>
+          <th>Check-in</th><th>Check-out</th><th>Worked / OT</th><th>Status</th>
         </tr>
       </thead>
-      <tbody id="attBody"></tbody>
+      <tbody id="attTableBody"></tbody>
     </table>
   </div>
-
 </div>
 
 <div id="toast"></div>
-<script src="Java Script And CSS/app.js"></script>
-<script>checkAuth();</script>
+<script src="app.js"></script>
+<script>
+checkAuth();
+
+// Live clock
+function updateClock(){
+  const now = new Date();
+  const td = get('todayDisplay');
+  const ti = get('timeDisplay');
+  if(td) td.value = now.toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+  if(ti) ti.value = now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// Current selected employee
+let _selectedEmp = null;
+
+window.onEmpSelected = function(emp){
+  _selectedEmp = emp;
+  renderEmpAttCard(emp);
+  checkAnomaliesForEmp(emp.empId);
+};
+
+setupSearch('attEmpSearch','attEmpDrop', emp=>{
+  _selectedEmp = emp;
+  renderEmpAttCard(emp);
+  checkAnomaliesForEmp(emp.empId);
+});
+
+function checkAnomaliesForEmp(empId){
+  const recs = ls.get('attendance').filter(r=>r.empId===empId);
+  const abs  = recs.filter(r=>r.status==='Absent').length;
+  const late = recs.filter(r=>r.status==='Late').length;
+  const emp  = ls.get('employees').find(e=>e.empId===empId);
+  const box  = get('anomalyAlert');
+  if(!box) return;
+  if(abs>=3){
+    box.style.display='block';
+    box.innerHTML=`⚠️ <strong>Anomaly:</strong> ${emp?.name||empId} has <strong>${abs} absences</strong>. HR review recommended.`;
+  } else if(late>=3){
+    box.style.display='block';
+    box.innerHTML=`⚠️ <strong>Anomaly:</strong> ${emp?.name||empId} has been <strong>late ${late} times</strong>.`;
+  } else {
+    box.style.display='none';
+  }
+}
+
+function markAbsent(){
+  if(!_selectedEmp){ toast('⚠ Search and select an employee first','#dc3545'); return; }
+  const today = todayStr();
+  const att = ls.get('attendance');
+  const exists = att.find(r=>r.empId===_selectedEmp.empId && r.date===today);
+  if(exists){ toast('Record already exists for today','#f39c12'); return; }
+  att.push({
+    id:Date.now(), empId:_selectedEmp.empId, empName:_selectedEmp.name,
+    dept:_selectedEmp.dept, date:today, shift:_selectedEmp.shift||'Morning',
+    shiftStart:'', shiftEnd:'', checkIn:null, checkOut:null,
+    workedMins:0, otMins:0, status:'Absent'
+  });
+  ls.set('attendance', att);
+  renderAttTable();
+  toast(`${_selectedEmp.name} marked Absent for today`,'#dc3545');
+}
+</script>
 </body>
 </html>
