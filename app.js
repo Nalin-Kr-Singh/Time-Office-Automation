@@ -1,9 +1,5 @@
-/* ══ TIME OFFICE v2 — app.js ══
-   Central data store + all page logic
-   Everything reads/writes from localStorage via ls.*
-*/
 
-// ── HELPERS ──────────────────────────────────────────────
+
 const get = id => document.getElementById(id);
 const ls = {
   get:    k => JSON.parse(localStorage.getItem(k) || '[]'),
